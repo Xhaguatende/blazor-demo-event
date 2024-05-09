@@ -1,0 +1,55 @@
+﻿@page "/sign-in"
+
+@inject NavigationManager NavigationManager
+@inject IAccountServices AccountServices
+
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
+
+<PageTitle>Sign-In</PageTitle>
+<h3>Sign-In</h3>
+
+<div class="row justify-content-center">
+    <div class="col-md-4">
+        <EditForm Model="@SignInRequest" FormName="signIn" OnValidSubmit="HandleValidAsync">
+            <DataAnnotationsValidator />
+            <div class="form-group mb-3">
+                <label asp-for="Email"></label>
+                <InputText id="email" placeholder="Email" class="form-control" @bind-Value="SignInRequest.Email"/>
+                <ValidationMessage For="() => SignInRequest.Email"/>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Sign in</button>
+        </EditForm>
+        
+        @if (!string.IsNullOrEmpty(ErrorMessage))
+        {
+            <div class="alert alert-danger mt-3">
+                @ErrorMessage
+            </div>
+        }
+
+    </div>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private SignInRequest SignInRequest { get; set; } = new();
+
+    private string ErrorMessage { get; set; } = string.Empty;
+
+    private async Task HandleValidAsync()
+    {
+        ErrorMessage = string.Empty;
+
+        var result = await AccountServices.SignInAsync(SignInRequest);
+
+        if (result.Success)
+        {
+            NavigationManager.NavigateTo("/");
+        }
+        else
+        {
+            ErrorMessage = result.Message ?? "Sign-in failed. Please try again.";
+        }
+    }
+
+}

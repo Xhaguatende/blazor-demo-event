@@ -1,0 +1,46 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IAccountServices AccountServices
+@inject NavigationManager NavigationManager
+
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
+
+<CascadingAuthenticationState>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Home</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNavDropdown">
+                <ul class="navbar-nav">
+                    <AuthorizeView>
+                        <Authorized>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/events">Events</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="" @onclick="SingOutASync">Sign-Out</a>
+                            </li>
+                        </Authorized>
+                        <NotAuthorized>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/sign-in">Sign-In</a>
+                            </li>
+                        </NotAuthorized>
+                    </AuthorizeView>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</CascadingAuthenticationState>
+
+
+@code {
+
+    private async Task SingOutASync()
+    {
+        await AccountServices.SignOutAsync();
+    }
+}

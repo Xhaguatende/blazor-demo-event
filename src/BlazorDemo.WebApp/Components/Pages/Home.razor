@@ -1,0 +1,21 @@
+﻿@page "/"
+
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
+
+<PageTitle>Home</PageTitle>
+
+<h1>Home</h1>
+
+<CascadingAuthenticationState>
+    <AuthorizeView>
+        <Authorized>
+            <article class="mt-3">
+                <p>Hello, @context.User.Identity?.Name!</p>
+                <p>Welcome...</p>
+            </article>
+        </Authorized>
+        <NotAuthorized>
+            Please, sign in <a href="/sign-in">here</a> to use the website.
+        </NotAuthorized>
+    </AuthorizeView>
+</CascadingAuthenticationState>
