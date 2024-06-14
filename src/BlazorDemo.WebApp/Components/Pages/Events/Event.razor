@@ -1,6 +1,7 @@
 ﻿@page "/new-event"
 @page "/edit-event/{id:guid}"
 
+@inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
 @inject IEventServices EventServices
 
@@ -10,43 +11,45 @@
 
 <h3>@_title</h3>
 
-@if (UpsertEvent == null)
-{
-    <p><em>Loading...</em></p>
+<AuthorizeView>
+    @if (UpsertEvent == null)
+    {
+        <p><em>Loading...</em></p>
 
-}
-else
-{
-    <div class="row">
-        <div class="col-md-4">
-            <EditForm Model="@UpsertEvent" FormName="editProduct" OnValidSubmit="HandleValidAsync">
-                <DataAnnotationsValidator />
-                <ValidationSummary />
-                <div class="mb-3">
-                    <label for="title" class="form-label">Title:</label>
-                    <InputText id="title" class="form-control" @bind-Value="UpsertEvent!.Title" />
-                    <ValidationMessage For="() => UpsertEvent.Title" />
-                </div>
+    }
+    else
+    {
+        <div class="row">
+            <div class="col-md-4">
+                <EditForm Model="@UpsertEvent" FormName="editProduct" OnValidSubmit="HandleValidAsync">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Title:</label>
+                        <InputText id="title" class="form-control" @bind-Value="UpsertEvent!.Title" />
+                        <ValidationMessage For="() => UpsertEvent.Title" />
+                    </div>
 
-                <div class="mb-3">
-                    <label for="description" class="form-label">Description:</label>
-                    <InputTextArea id="description" class="form-control" @bind-Value="UpsertEvent.Description" />
-                    <ValidationMessage For="() => UpsertEvent.Description" />
-                </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description:</label>
+                        <InputTextArea id="description" class="form-control" @bind-Value="UpsertEvent.Description" />
+                        <ValidationMessage For="() => UpsertEvent.Description" />
+                    </div>
 
-                <div class="mb-3">
-                    <label for="startDate" class="form-label">Start Date:</label>
-                    <InputDate id="startDate" class="form-control" @bind-Value="UpsertEvent.StartDate" />
-                    <ValidationMessage For="() => UpsertEvent.StartDate" />
-                </div>
+                    <div class="mb-3">
+                        <label for="startDate" class="form-label">Start Date:</label>
+                        <InputDate id="startDate" class="form-control" @bind-Value="UpsertEvent.StartDate" />
+                        <ValidationMessage For="() => UpsertEvent.StartDate" />
+                    </div>
 
-                <button type="submit" class="btn btn-primary">Save</button>
-                <a class="btn btn-secondary" role="button" href="/events">Cancel</a>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                    <a class="btn btn-secondary" role="button" href="/events">Cancel</a>
 
-            </EditForm>
+                </EditForm>
+            </div>
         </div>
-    </div>
-}
+    }
+</AuthorizeView>
 
 @code {
     [Parameter]
@@ -56,6 +59,16 @@ else
     public UpsertEvent? UpsertEvent { get; set; }
 
     private string _title = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        if (!authState.User.Identity?.IsAuthenticated ?? false)
+        {
+            NavigationManager.NavigateTo("/sign-in");
+        }
+         
+    }
 
     protected override async Task OnParametersSetAsync()
     {
