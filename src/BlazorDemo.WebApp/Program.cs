@@ -4,7 +4,6 @@ using BlazorDemo.WebApp.Providers;
 using BlazorDemo.WebApp.Services.Implementations;
 using BlazorDemo.WebApp.Services.Interfaces;
 using BlazorDemo.WebApp.Settings;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.Options;
 
@@ -13,7 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
 services.AddRazorComponents().AddInteractiveServerComponents();
 services.AddCascadingAuthenticationState();
- 
+
 services.AddAuthentication(
     options =>
     {
@@ -67,4 +66,4 @@ app.UseAuthorization();
 
 app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
 
-app.Run();
+await app.RunAsync();

@@ -1,0 +1,33 @@
+name: Build Pipeline
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - '**/README.md'
+  workflow_dispatch: # Allows manual trigger
+
+jobs:
+  call-build-workflow:
+    uses: Xhaguatende/reusable-workflows/.github/workflows/dotnet-web-reusable.yml@main
+    with:
+      dotnet_version: "9.x"
+      sonar_cloud_organization: "xhaguatende-01"
+      sonar_cloud_project_key: "Xhaguatende_blazor-demo-event"
+      publish_project: "./BlazorDemo.WebApp/BlazorDemo.WebApp.csproj"
+      docker_file: "./docker/Dockerfile.WebApp"
+      docker_hub_repository: "blazor-demo-event"
+      docker_image_title: "My Blazor Demo"
+      docker_image_description: "Docker image for My Blazor Demo"
+    secrets: inherit 
+
+  call-deploy-workflow:
+    needs: call-build-workflow
+    uses: Xhaguatende/reusable-workflows/.github/workflows/deploy-azure-containerapp.yml@main
+    with:
+      azure_containerapp_name: "ca-xhagua-web-dev-01"
+      azure_resource_group: "xhagua-core-dev-01"
+      docker_hub_repository: "blazor-demo-event"
+      fullSemVer: ${{ needs.call-build-workflow.outputs.version }}
+    secrets: inherit
